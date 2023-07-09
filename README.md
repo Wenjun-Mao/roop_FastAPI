@@ -13,6 +13,7 @@ The GET endpoint, on the other hand, allows users to download a processed video.
 - **Secure Data Handling:** All operations involving file processing and communication with external systems are protected by asyncio locks to ensure thread safety.
 - **Error Handling:** The application provides meaningful HTTPException responses in case of errors during processing.
 - **Background Tasks:** FastAPI's BackgroundTasks are used to send data to a destination API after returning the response.
+- **Stable-diffusion-webui** can be called for further processing.
 - **Environmental Variables:** Environmental variables are used to store sensitive data, such as server addresses and paths.
 
 
@@ -22,6 +23,7 @@ To install this project, clone the repository and install the required dependenc
 Then install FastAPI with the following command:
 ```
 pip install fastapi[all]
+pip install webuiapi
 ```
 
 A .env file is needed to set the necessary environmental variables. .env-TEMPLATE is included in the repository as a template for the .env file. The following environmental variables are required:
