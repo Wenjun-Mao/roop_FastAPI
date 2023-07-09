@@ -68,8 +68,7 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(file.file.read())
     elif url:
-        decoded_url = unquote(url)
-        response = get_url_with_retry(decoded_url)
+        response = get_url_with_retry(url)
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(response.content)
 
@@ -179,6 +178,7 @@ def upload_user_picture(app, lock):
             id_value = id
             logger.info(f"Processing request for id: {id_value}")
 
+            url = unquote(url) if url else None
             validate_inputs(content_type, content_name, file, url)
             incoming_file_path = save_incoming_file(file, url)
             download_link = run_script(
