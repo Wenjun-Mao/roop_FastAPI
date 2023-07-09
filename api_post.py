@@ -3,10 +3,9 @@
 import asyncio
 import logging
 
+from api_util_content_manager import upload_user_picture
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-
-from api_util_content_manager import upload_user_picture
 
 # Set up logging
 logging.basicConfig(
