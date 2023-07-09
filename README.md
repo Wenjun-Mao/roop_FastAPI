@@ -41,6 +41,7 @@ Send a POST request to the / endpoint with the necessary parameters. If successf
 ## Endpoints
 - **POST /**: Used to upload data for processing. Accepts parameters like an image, a user identifier, etc.
 - **GET /download_video/{date}/{video_name}**: Used to download the processed video.
+- **GET /download_pic/{date}/{pic_name}**: Used to download the processed picture.
 
 
 ## Contributing
