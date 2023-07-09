@@ -167,6 +167,7 @@ def upload_user_picture(app, lock):
         id: str = Form(...),
     ):
         async with lock:
+            url = unquote(url) if url else None
             logger.info(
                 "content_name: %s, face_restore: %s, file: %s, url: %s",
                 content_name,
@@ -178,7 +179,6 @@ def upload_user_picture(app, lock):
             id_value = id
             logger.info(f"Processing request for id: {id_value}")
 
-            url = unquote(url) if url else None
             validate_inputs(content_type, content_name, file, url)
             incoming_file_path = save_incoming_file(file, url)
             download_link = run_script(
