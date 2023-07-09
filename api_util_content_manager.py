@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import sys
+import time
 from typing import Optional
 from urllib.parse import unquote
 
@@ -43,6 +44,19 @@ def validate_inputs(
         )
 
 
+def get_url_with_retry(url: str, timeout: int = 15, max_attempts: int = 3):
+    attempts = 0
+    while attempts < max_attempts:
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()  # Raise exception if status code is not 200
+            return response
+        except (requests.Timeout, requests.HTTPError):
+            attempts += 1
+            time.sleep(2)  # Wait for 2 seconds before next attempt
+    raise requests.Timeout(f"Failed to retrieve {url} after {max_attempts} attempts")
+
+
 def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
     incoming_folder = f"{media_path}/api_incoming"
     os.makedirs(incoming_folder, exist_ok=True)
@@ -55,8 +69,7 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
             buffer.write(file.file.read())
     elif url:
         decoded_url = unquote(url)
-        response = requests.get(decoded_url)
-        response.raise_for_status()
+        response = get_url_with_retry(decoded_url)
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(response.content)
 
