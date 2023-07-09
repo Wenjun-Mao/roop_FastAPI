@@ -6,16 +6,22 @@ from api_app_config import media_path
 import logging
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S %p')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S %p",
+)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
 
 @app.get("/download_video/{date}/{video_name}")
 async def download_video(date: str, video_name: str):
     file_path = f"{media_path}/api_outgoing/video/{date}/{video_name}"
     logger.info(f"Downloading video: {file_path}")
     return FileResponse(file_path)
+
 
 @app.get("/download_pic/{date}/{pic_name}")
 async def download_pic(date: str, pic_name: str):
