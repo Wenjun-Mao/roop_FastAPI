@@ -6,6 +6,8 @@ import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
+from api_util_content_manager import upload_user_picture
+
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -25,8 +27,5 @@ async def handle_connection_reset_error(request, exc):
         status_code=500, content={"message": "---Unexpected connection error---"}
     )
 
-
-# Import routes
-from api_util_content_manager import upload_user_picture
 
 upload_user_picture(app, lock)

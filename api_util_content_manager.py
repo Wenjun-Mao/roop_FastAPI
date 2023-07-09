@@ -9,8 +9,7 @@ from typing import Optional
 from urllib.parse import unquote
 
 import requests
-from api_app_config import (DEBUG, media_path, script_path, sd_webui_host,
-                            sd_webui_port, server_address)
+from api_app_config import DEBUG, media_path, script_path, server_address
 from api_destination_handler import send_to_destination
 from api_face_restore import pic_face_restore
 from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
@@ -27,16 +26,16 @@ def validate_inputs(
     picture_template_folder = f"{media_path}/api_pic_templates"
     jpg_files = [f for f in os.listdir(picture_template_folder) if f.endswith(".jpg")]
 
-    # Check if the content_name exists in the templates, raise an error if not found
+    # Check if the content_name exists in the templates
     if content_type == "video" and f"{content_name}.mp4" not in mp4_files:
         raise HTTPException(
             status_code=400,
-            detail="The requested content_name was not found in the video_template_folder folder.",
+            detail="video not found in the video_template_folder folder.",
         )
     if content_type == "picture" and f"{content_name}.jpg" not in jpg_files:
         raise HTTPException(
             status_code=400,
-            detail="The requested content_name was not found in the picture_template_folder folder.",
+            detail="Picture not found in the picture_template_folder folder.",
         )
     if not file and not url:
         raise HTTPException(
@@ -85,9 +84,9 @@ def run_script(
 
     os.makedirs(output_dir, exist_ok=True)
     outgoing_file_path = os.path.join(output_dir, output_filename)
-    incoming_file_path4subprocess = os.path.normpath(incoming_file_path)
+    file_path4subprocess = os.path.normpath(incoming_file_path)
 
-    logger.info(f"incoming_file_path4subprocess: {incoming_file_path4subprocess}")
+    logger.info(f"file_path4subprocess: {file_path4subprocess}")
     logger.info(f"targert_path: {targert_path}")
     logger.info(f"outgoing_file_path: {outgoing_file_path}")
 
@@ -99,7 +98,7 @@ def run_script(
                 "--execution-provider",
                 "cuda",
                 "--source",
-                incoming_file_path4subprocess,
+                file_path4subprocess,
                 "--target",
                 targert_path,
                 "--output",
@@ -117,12 +116,10 @@ def run_script(
             raise subprocess.CalledProcessError(return_code, proc.args)
 
     except subprocess.CalledProcessError as e:
-        logger.error(
-            f"Sorry, something went wrong with the face algorithm. The error is {e}"
-        )
+        logger.error(f"Something went wrong with the algorithm. Error is {e}")
         raise HTTPException(
             status_code=500,
-            detail=f"Sorry, something went wrong with the face algorithm. The error is {e}",
+            detail=f"Something went wrong with the algorithm. Error is {e}",
         )
 
     # Face restore and return the picture download link
@@ -159,7 +156,11 @@ def upload_user_picture(app, lock):
     ):
         async with lock:
             logger.info(
-                f"content_name: {content_name}, face_restore: {face_restore}, file: {file}, url: {url}"
+                "content_name: %s, face_restore: %s, file: %s, url: %s",
+                content_name,
+                face_restore,
+                file,
+                url,
             )
 
             id_value = id

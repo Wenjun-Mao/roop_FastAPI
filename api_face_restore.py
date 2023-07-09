@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def save_output_pic_from_sd_ret(opened_image, current_mmdd: str, current_ymdhms: str):
     output_dir = f"{media_path}/api_outgoing/pic/{current_mmdd}"
-    # Convert the PIL image to a NumPy array and change the channel order to BGR
+    # Convert the PIL img to a NumPy array and change the channel order to BGR
     img_np = np.array(opened_image)[:, :, ::-1]
     # Encode the image as a JPEG byte array
     img_bytes = cv2.imencode(".jpg", img_np)[1].tobytes()
