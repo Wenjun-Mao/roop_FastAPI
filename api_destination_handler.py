@@ -1,7 +1,8 @@
 # api_destination_handler.py
 
-import requests
 import logging
+
+import requests
 from api_app_config import destination_url
 
 logger = logging.getLogger(__name__)

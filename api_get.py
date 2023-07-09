@@ -1,9 +1,10 @@
 # api_get.py
 
+import logging
+
+from api_app_config import media_path
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
-from api_app_config import media_path
-import logging
 
 # Set up logging
 logging.basicConfig(

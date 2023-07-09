@@ -1,9 +1,10 @@
 # api_post.py
 
+import asyncio
+import logging
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-import logging
-import asyncio
 
 # Set up logging
 logging.basicConfig(

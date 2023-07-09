@@ -1,24 +1,19 @@
 # api_util_content_manager.py
 
-from fastapi import BackgroundTasks, HTTPException, Form, File, UploadFile
-from typing import Optional
+import datetime
 import logging
-from api_destination_handler import send_to_destination
+import os
 import subprocess
 import sys
-import os
-import datetime
-import requests
+from typing import Optional
 from urllib.parse import unquote
-from api_app_config import (
-    media_path,
-    server_address,
-    script_path,
-    DEBUG,
-    sd_webui_host,
-    sd_webui_port,
-)
+
+import requests
+from api_app_config import (DEBUG, media_path, script_path, sd_webui_host,
+                            sd_webui_port, server_address)
+from api_destination_handler import send_to_destination
 from api_face_restore import pic_face_restore
+from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
 
 logger = logging.getLogger(__name__)
 

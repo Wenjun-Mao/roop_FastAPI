@@ -1,7 +1,8 @@
 # api_app_config.py
 
 import os
-from dotenv import load_dotenv, find_dotenv
+
+from dotenv import find_dotenv, load_dotenv
 
 _ = load_dotenv(find_dotenv())
 destination_url = os.getenv("SYNC_URL")

@@ -1,12 +1,13 @@
 # api_face_restore.py
 
-import os
 import logging
-import numpy as np
+import os
+
 import cv2
+import numpy as np
 import webuiapi
+from api_app_config import media_path, sd_webui_host, sd_webui_port
 from PIL import Image
-from api_app_config import sd_webui_host, sd_webui_port, media_path
 
 logger = logging.getLogger(__name__)
 
