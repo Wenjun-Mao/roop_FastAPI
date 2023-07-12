@@ -46,11 +46,17 @@ def validate_inputs(
 
 
 def get_url_with_retry(url: str, timeout: int = 15, max_attempts: int = 3):
+    start_time = time.time()
     attempts = 0
     while attempts < max_attempts:
         try:
             response = requests.get(url, timeout=timeout)
             response.raise_for_status()  # Raise exception if status code is not 200
+            logger.info(
+                "Picture received in %s seconds with %s attempt(s).",
+                round(time.time() - start_time, 2),
+                attempts + 1,
+            )
             return response
         except (requests.Timeout, requests.HTTPError):
             attempts += 1
@@ -76,12 +82,9 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
     return incoming_file_path
 
 
-def run_script(
-    content_type: str, incoming_file_path: str, content_name: str, face_restore: bool
-):
-    current_mmdd = datetime.datetime.now().strftime("%m-%d")
-    current_ymdhms = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
+def create_api_outgoing_media_paths(
+        content_type: str, content_name: str, current_mmdd: str, current_ymdhms: str
+    ):
     if content_type == "video":
         targert_path = os.path.normpath(
             f"{media_path}/api_video_templates/{content_name}.mp4"
@@ -97,6 +100,20 @@ def run_script(
 
     os.makedirs(output_dir, exist_ok=True)
     outgoing_file_path = os.path.join(output_dir, output_filename)
+
+    return targert_path, output_filename, outgoing_file_path
+
+
+def run_script(
+    content_type: str, incoming_file_path: str, content_name: str, face_restore: bool
+):
+    current_mmdd = datetime.datetime.now().strftime("%m-%d")
+    current_ymdhms = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    targert_path, output_filename, outgoing_file_path = create_api_outgoing_media_paths(
+        content_type, content_name, current_mmdd, current_ymdhms
+    )
+
     file_path4subprocess = os.path.normpath(incoming_file_path)
 
     logger.info(f"file_path4subprocess: {file_path4subprocess}")
@@ -172,24 +189,26 @@ def upload_user_picture(app, lock):
         url: Optional[str] = Form(None),
         id: str = Form(...),
     ):
+        url = unquote(url) if url else None
+        logger.info(
+            "content_name: %s, face_restore: %s, file: %s, url: %s",
+            content_name,
+            face_restore,
+            file,
+            url,
+        )
+
+        id_value = id
+        logger.info(f"Processing request for id: {id_value}")
+
+        validate_inputs(content_type, content_name, file, url)
+        incoming_file_path = save_incoming_file(file, url)
+
         async with lock:
-            url = unquote(url) if url else None
-            logger.info(
-                "content_name: %s, face_restore: %s, file: %s, url: %s",
-                content_name,
-                face_restore,
-                file,
-                url,
-            )
-
-            id_value = id
-            logger.info(f"Processing request for id: {id_value}")
-
-            validate_inputs(content_type, content_name, file, url)
-            incoming_file_path = save_incoming_file(file, url)
             download_link = run_script(
                 content_type, incoming_file_path, content_name, face_restore
             )
+            logger.info(f"face swap successful for id: {id_value}")
             schedule_background_task(background_tasks, id_value, download_link)
 
             return {"download_link": download_link}
