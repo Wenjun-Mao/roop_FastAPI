@@ -12,3 +12,5 @@ script_path = os.getenv("SCRIPT_PATH")
 DEBUG = os.getenv("DEBUG") == "True"  # This will be a boolean
 sd_webui_host = os.getenv("SD_WEBUI_HOST")
 sd_webui_port = int(os.getenv("SD_WEBUI_PORT"))
+default_video_path = os.getenv("DEFAULT_VIDEO_PATH")
+default_picture_path = os.getenv("DEFAULT_PICTURE_PATH")

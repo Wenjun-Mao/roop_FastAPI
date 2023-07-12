@@ -10,7 +10,8 @@ from typing import Optional
 from urllib.parse import unquote
 
 import requests
-from api_app_config import DEBUG, media_path, script_path, server_address
+from api_app_config import (DEBUG, default_picture_path, default_video_path,
+                            media_path, script_path, server_address)
 from api_destination_handler import send_to_destination
 from api_face_restore import pic_face_restore
 from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
@@ -117,22 +118,28 @@ def run_script(
                 outgoing_file_path,
                 "--keep-fps",
             ],
-            stdout=None if DEBUG else subprocess.DEVNULL,
-            stderr=None if DEBUG else subprocess.DEVNULL,
-        )  # only show subprocess logs if DEBUG is True
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
-        return_code = proc.wait()  # This will get the return code
+        stdout, stderr = proc.communicate()
+        return_code = proc.wait()
 
-        if return_code != 0:
+        if DEBUG:
+            logger.info(f"stdout: {stdout.decode()}")
+
+        if return_code != 0 or "No face in source path detected" in stdout.decode():
             logger.error(f"Script exited with return code: {return_code}")
-            raise subprocess.CalledProcessError(return_code, proc.args)
+            logger.error(f"stdout: {stdout.decode()}")
+            logger.error(f"stderr: {stderr.decode()}")
+            raise subprocess.CalledProcessError(return_code, proc.args, output=stdout)
 
     except subprocess.CalledProcessError as e:
         logger.error(f"Something went wrong with the algorithm. Error is {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Something went wrong with the algorithm. Error is {e}",
-        )
+        if content_type == "video":
+            return f"{server_address}/download_video/{default_video_path}"
+        elif content_type == "picture":
+            return f"{server_address}/download_video/{default_picture_path}"
 
     # Face restore and return the picture download link
     logger.info(f"face_restore: {face_restore}\n")
@@ -145,7 +152,6 @@ def run_script(
     elif content_type == "picture" and face_restore == 111:
         return f"{server_address}/download_pic/{current_mmdd}/{output_filename}"
 
-    # Return the video download link
     return f"{server_address}/download_video/{current_mmdd}/{output_filename}"
 
 
