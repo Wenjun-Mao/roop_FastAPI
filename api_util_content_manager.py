@@ -156,7 +156,7 @@ def run_media_processing_script(
         if content_type == "video":
             return f"{server_address}/download_video/{default_video_path}"
         elif content_type == "picture":
-            return f"{server_address}/download_video/{default_picture_path}"
+            return f"{server_address}/download_pic/{default_picture_path}"
 
     # Face restore and return the picture download link
     logger.info(f"face_restore: {face_restore}\n")
