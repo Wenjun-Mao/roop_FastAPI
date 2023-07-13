@@ -12,7 +12,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def save_output_pic_from_sd_ret(opened_image, current_mmdd: str, current_ymdhms: str):
+def save_output_picture_from_sd_return(opened_image, current_mmdd: str, current_ymdhms: str):
     output_dir = f"{media_path}/api_outgoing/pic/{current_mmdd}"
     # Convert the PIL img to a NumPy array and change the channel order to BGR
     img_np = np.array(opened_image)[:, :, ::-1]
@@ -29,7 +29,7 @@ def save_output_pic_from_sd_ret(opened_image, current_mmdd: str, current_ymdhms:
     return output_filename
 
 
-def pic_face_restore(outgoing_file_path: str, current_mmdd: str, current_ymdhms: str):
+def apply_face_restoration_to_picture(outgoing_file_path: str, current_mmdd: str, current_ymdhms: str):
     img = Image.open(outgoing_file_path)
     api = webuiapi.WebUIApi(sd_webui_host, sd_webui_port)
     restored_img = api.extra_single_image(
@@ -38,7 +38,7 @@ def pic_face_restore(outgoing_file_path: str, current_mmdd: str, current_ymdhms:
         gfpgan_visibility=1,
     )
     logger.info("SD job done.")
-    output_filename = save_output_pic_from_sd_ret(
+    output_filename = save_output_picture_from_sd_return(
         restored_img.image, current_mmdd, current_ymdhms
     )
     logger.info(f"Face_restored file: {output_filename}")

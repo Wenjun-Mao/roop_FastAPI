@@ -8,7 +8,7 @@ from api_app_config import destination_url
 logger = logging.getLogger(__name__)
 
 
-async def send_to_destination(id_value, download_url):
+async def send_return_data_to_api(id_value, download_url):
     # Prepare data for the final destination
     data = {
         "url": download_url,

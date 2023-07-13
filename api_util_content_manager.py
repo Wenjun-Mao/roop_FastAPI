@@ -12,8 +12,8 @@ from urllib.parse import unquote
 import requests
 from api_app_config import (DEBUG, default_picture_path, default_video_path,
                             media_path, script_path, server_address)
-from api_destination_handler import send_to_destination
-from api_face_restore import pic_face_restore
+from api_data_sender import send_return_data_to_api
+from api_face_restore import apply_face_restoration_to_picture
 from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ def validate_inputs(
         )
 
 
-def get_url_with_retry(url: str, timeout: int = 15, max_attempts: int = 3):
+def download_from_url_with_retry(url: str, timeout: int = 15, max_attempts: int = 3):
     start_time = time.time()
     attempts = 0
     while attempts < max_attempts:
@@ -75,7 +75,7 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(file.file.read())
     elif url:
-        response = get_url_with_retry(url)
+        response = download_from_url_with_retry(url)
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(response.content)
 
@@ -162,7 +162,7 @@ def run_media_processing_script(
     logger.info(f"face_restore: {face_restore}\n")
     if content_type == "picture" and face_restore != 111:
         logger.info(f"Send for face_restore: {outgoing_file_path}")
-        output_filename = pic_face_restore(
+        output_filename = apply_face_restoration_to_picture(
             outgoing_file_path, current_mmdd, current_ymdhms
         )
         return f"{server_address}/download_pic/{current_mmdd}/{output_filename}"
@@ -175,7 +175,7 @@ def run_media_processing_script(
 def schedule_data_send_task(
     background_tasks: BackgroundTasks, id_value: str, download_link: str
 ):
-    background_tasks.add_task(send_to_destination, id_value, download_link)
+    background_tasks.add_task(send_return_data_to_api, id_value, download_link)
 
 
 def user_picture_endpoint(app, lock):
