@@ -3,7 +3,7 @@
 import asyncio
 import logging
 
-from api_util_content_manager import upload_user_picture
+from api_util_content_manager import user_picture_endpoint
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
@@ -27,4 +27,4 @@ async def handle_connection_reset_error(request, exc):
     )
 
 
-upload_user_picture(app, lock)
+user_picture_endpoint(app, lock)

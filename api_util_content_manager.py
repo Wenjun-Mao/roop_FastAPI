@@ -82,7 +82,7 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
     return incoming_file_path
 
 
-def create_api_outgoing_media_paths(
+def create_outgoing_paths(
         content_type: str, content_name: str, current_mmdd: str, current_ymdhms: str
     ):
     if content_type == "video":
@@ -104,13 +104,13 @@ def create_api_outgoing_media_paths(
     return targert_path, output_filename, outgoing_file_path
 
 
-def run_script(
+def run_media_processing_script(
     content_type: str, incoming_file_path: str, content_name: str, face_restore: bool
 ):
     current_mmdd = datetime.datetime.now().strftime("%m-%d")
     current_ymdhms = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    targert_path, output_filename, outgoing_file_path = create_api_outgoing_media_paths(
+    targert_path, output_filename, outgoing_file_path = create_outgoing_paths(
         content_type, content_name, current_mmdd, current_ymdhms
     )
 
@@ -172,15 +172,15 @@ def run_script(
     return f"{server_address}/download_video/{current_mmdd}/{output_filename}"
 
 
-def schedule_background_task(
+def schedule_data_send_task(
     background_tasks: BackgroundTasks, id_value: str, download_link: str
 ):
     background_tasks.add_task(send_to_destination, id_value, download_link)
 
 
-def upload_user_picture(app, lock):
+def user_picture_endpoint(app, lock):
     @app.post("/")
-    async def upload_picture(
+    async def process_user_picture(
         background_tasks: BackgroundTasks,
         content_type: str = Form(...),
         content_name: str = Form(...),
@@ -205,10 +205,10 @@ def upload_user_picture(app, lock):
         incoming_file_path = save_incoming_file(file, url)
 
         async with lock:
-            download_link = run_script(
+            download_link = run_media_processing_script(
                 content_type, incoming_file_path, content_name, face_restore
             )
             logger.info(f"face swap successful for id: {id_value}")
-            schedule_background_task(background_tasks, id_value, download_link)
+            schedule_data_send_task(background_tasks, id_value, download_link)
 
             return {"download_link": download_link}
