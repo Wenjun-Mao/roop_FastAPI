@@ -64,13 +64,16 @@ def download_from_url_with_retry(url: str, timeout: int = 15, max_attempts: int 
     raise requests.Timeout(f"Failed to retrieve {url} after {max_attempts} attempts")
 
 
-def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
+def create_incoming_file_path(file: Optional[UploadFile], url: Optional[str]):
     incoming_folder = f"{media_path}/api_incoming"
     os.makedirs(incoming_folder, exist_ok=True)
-    incoming_file_path = os.path.normpath(
-        os.path.join(incoming_folder, file.filename if file else os.path.basename(url))
-    )
+    incoming_file_path = os.path.join(
+        incoming_folder, file.filename if file else os.path.basename(url)
+        )
+    return incoming_file_path
 
+
+def save_incoming_file(file: Optional[UploadFile], url: Optional[str], incoming_file_path: str):
     if file:
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(file.file.read())
@@ -78,8 +81,6 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str]):
         response = download_from_url_with_retry(url)
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(response.content)
-
-    return incoming_file_path
 
 
 def create_outgoing_paths(
@@ -202,7 +203,8 @@ def user_picture_endpoint(app, lock):
         logger.info(f"Processing request for id: {id_value}")
 
         validate_inputs(content_type, content_name, file, url)
-        incoming_file_path = save_incoming_file(file, url)
+        incoming_file_path = create_incoming_file_path(file, url)
+        save_incoming_file(file, url, incoming_file_path)
 
         async with lock:
             download_link = run_media_processing_script(
