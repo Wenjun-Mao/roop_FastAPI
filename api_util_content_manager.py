@@ -69,11 +69,13 @@ def create_incoming_file_path(file: Optional[UploadFile], url: Optional[str]):
     os.makedirs(incoming_folder, exist_ok=True)
     incoming_file_path = os.path.join(
         incoming_folder, file.filename if file else os.path.basename(url)
-        )
+    )
     return incoming_file_path
 
 
-def save_incoming_file(file: Optional[UploadFile], url: Optional[str], incoming_file_path: str):
+def save_incoming_file(
+    file: Optional[UploadFile], url: Optional[str], incoming_file_path: str
+):
     if file:
         with open(incoming_file_path, "wb") as buffer:
             buffer.write(file.file.read())
@@ -84,8 +86,8 @@ def save_incoming_file(file: Optional[UploadFile], url: Optional[str], incoming_
 
 
 def create_outgoing_paths(
-        content_type: str, content_name: str, current_mmdd: str, current_ymdhms: str
-    ):
+    content_type: str, content_name: str, current_mmdd: str, current_ymdhms: str
+):
     if content_type == "video":
         targert_path = os.path.normpath(
             f"{media_path}/api_video_templates/{content_name}.mp4"
@@ -116,11 +118,12 @@ def run_media_processing_script(
     )
 
     file_path4subprocess = os.path.normpath(incoming_file_path)
+    if DEBUG:
+        logger.info(f"file_path4subprocess: {file_path4subprocess}")
+        logger.info(f"targert_path: {targert_path}")
+        logger.info(f"outgoing_file_path: {outgoing_file_path}")
 
-    logger.info(f"file_path4subprocess: {file_path4subprocess}")
-    logger.info(f"targert_path: {targert_path}")
-    logger.info(f"outgoing_file_path: {outgoing_file_path}")
-
+    start_time = time.time()
     try:
         proc = subprocess.Popen(
             [
@@ -159,13 +162,12 @@ def run_media_processing_script(
         elif content_type == "picture":
             return f"{server_address}/download_pic/{default_picture_path}"
 
-    # Face restore and return the picture download link
-    logger.info(f"face_restore: {face_restore}\n")
+    logger.info("Script finished in %s seconds.", round(time.time() - start_time, 2))
+
+    # face restore
     if content_type == "picture" and face_restore != 111:
         logger.info(f"Send for face_restore: {outgoing_file_path}")
-        output_filename = apply_face_restoration_to_picture(
-            outgoing_file_path, current_mmdd, current_ymdhms
-        )
+        apply_face_restoration_to_picture(outgoing_file_path)
         return f"{server_address}/download_pic/{current_mmdd}/{output_filename}"
     elif content_type == "picture" and face_restore == 111:
         return f"{server_address}/download_pic/{current_mmdd}/{output_filename}"
