@@ -166,7 +166,8 @@ def run_media_processing_script(
 
     # face restore
     if content_type == "picture" and face_restore != 111:
-        logger.info(f"Send for face_restore: {outgoing_file_path}")
+        if DEBUG:
+            logger.info(f"Send for face_restore: {outgoing_file_path}")
         apply_face_restoration_to_picture(outgoing_file_path)
         return f"{server_address}/download_pic/{current_mmdd}/{output_filename}"
     elif content_type == "picture" and face_restore == 111:

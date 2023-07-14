@@ -162,6 +162,7 @@ cython_debug/
 # Others
 /archive
 /backup
+/SSL_certs_all
 
 # Ignore WIP items
 *_rq.py
