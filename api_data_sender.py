@@ -1,11 +1,10 @@
 # api_destination_handler.py
 
-import logging
-
 import requests
 from api_app_config import destination_url
+from api_logger_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def send_return_data_to_api(id_value, download_url):

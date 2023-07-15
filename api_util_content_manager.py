@@ -1,7 +1,6 @@
 # api_util_content_manager.py
 
 import datetime
-import logging
 import os
 import subprocess
 import sys
@@ -12,12 +11,13 @@ from urllib.parse import unquote
 import requests
 from api_app_config import (DEBUG, default_picture_path, default_video_path,
                             media_path, script_path, server_address)
+from api_logger_config import get_logger
 from api_data_sender import send_return_data_to_api
 from api_face_restore import apply_face_restoration_to_picture
 from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
 
-logger = logging.getLogger(__name__)
 
+logger = get_logger(__name__)
 
 def validate_inputs(
     content_type: str, content_name: str, file: Optional[UploadFile], url: Optional[str]

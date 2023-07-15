@@ -1,14 +1,13 @@
 # api_face_restore.py
 
-import logging
 import time
 
 import webuiapi
 from api_app_config import sd_webui_host, sd_webui_port
+from api_logger_config import get_logger
 from PIL import Image
 
-logger = logging.getLogger(__name__)
-
+logger = get_logger(__name__)
 
 def apply_face_restoration_to_picture(outgoing_file_path: str):
     start_time = time.time()
