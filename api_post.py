@@ -2,8 +2,8 @@
 
 import asyncio
 
-from api_util_content_manager import user_picture_endpoint
 from api_logger_config import get_logger
+from api_util_content_manager import user_picture_endpoint
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 

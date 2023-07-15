@@ -9,6 +9,7 @@ from PIL import Image
 
 logger = get_logger(__name__)
 
+
 def apply_face_restoration_to_picture(outgoing_file_path: str):
     start_time = time.time()
     img = Image.open(outgoing_file_path)
