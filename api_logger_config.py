@@ -1,3 +1,5 @@
+# api_logger_config.py
+
 import datetime
 import logging
 import os
@@ -22,9 +24,8 @@ def get_logger(name):
 
     # Create a file handler that logs even debug messages and rotates the log file at midnight
     handler = TimedRotatingFileHandler(
-        log_file, when="midnight", interval=1, backupCount=10
+        log_file, when="midnight", interval=1, backupCount=0
     )
-    handler.suffix = "%Y-%m-%d.txt"  # The suffix sets the filename of the backup files
     handler.setLevel(logging.INFO)
 
     # Create a console handler
