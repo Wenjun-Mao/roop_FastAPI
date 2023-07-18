@@ -22,8 +22,7 @@ To install this project, clone the repository and install the required dependenc
 
 Then install FastAPI with the following command:
 ```
-pip install fastapi[all]
-pip install webuiapi
+pip install fastapi[all] webuiapi
 ```
 
 A .env file is needed to set the necessary environmental variables. .env-TEMPLATE is included in the repository as a template for the .env file. The following environmental variables are required:
