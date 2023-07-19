@@ -3,6 +3,7 @@
 import asyncio
 import os
 os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['NO_FACE'] = '0'
 
 from api_logger_config import get_logger
 from api_refactor_util import *

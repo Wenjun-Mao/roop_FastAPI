@@ -6,7 +6,6 @@ from api_refactor_roop_func2 import *
 def run_media_processing_script(
     content_type: str, incoming_file_path: str, content_name: str, face_restore: bool
 ):
-    global noface
     current_mmdd = datetime.datetime.now().strftime("%m-%d")
     current_ymdhms = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -26,11 +25,11 @@ def run_media_processing_script(
         roop.globals.target_path = targert_path
         roop.globals.output_path = outgoing_file_path
         run()
-        print("noface: ", noface)
+        print("noface: ", os.environ.get("NO_FACE"))
     except Exception as e:
         logger.error(f"Something went wrong with the algorithm. Error is {e}")
 
-    if noface:
+    if os.environ.get("NO_FACE") == "1":
         if content_type == "video":
             return f"{server_address}/download_video/{default_video_path}"
         elif content_type == "picture":
