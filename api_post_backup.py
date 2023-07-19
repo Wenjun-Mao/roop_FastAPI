@@ -1,12 +1,9 @@
-# api_post_refactor.py
+# api_post.py
 
 import asyncio
-import os
-os.environ['OMP_NUM_THREADS'] = '1'
-os.environ['NO_FACE'] = '0'
 
 from api_logger_config import get_logger
-from api_refactor_util import *
+from api_util_content_manager import user_picture_endpoint
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
