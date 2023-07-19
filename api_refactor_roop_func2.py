@@ -1,25 +1,17 @@
+# api_refactor_roop_func2.py
+
+import cv2
 import os
 os.environ['OMP_NUM_THREADS'] = '1'
 
-def change_directory() -> None:
-    cwd = os.getcwd()
-    print(f"Current working directory: {cwd}")
-
-    parent_dir = os.path.dirname(cwd)
-    print(f"Parent directory: {parent_dir}")
-    new_dir = os.path.join(parent_dir, "roop_backend")
-
-    if os.path.exists(new_dir):
-        os.chdir(new_dir)
-    else:
-        print(f"Directory {new_dir} does not exist")
-
-    cwd = os.getcwd()
-    print(f"New working directory: {cwd}")  
+from api_refactor_roop_func1 import change_directory, update_status, release_resources
 
 change_directory()
 
 from roop.core import *
+from roop.face_analyser import get_one_face
+from roop.utilities import is_image, is_video
+import roop.processors.frame.face_swapper
 
 roop.globals.frame_processors = ["face_swapper"]
 roop.globals.headless = True
@@ -33,16 +25,9 @@ roop.globals.max_memory = suggest_max_memory()
 roop.globals.execution_providers = decode_execution_providers(["cuda"])
 roop.globals.execution_threads = suggest_execution_threads()
 
+noface = 0
 
-# Refactor some functions from roop.core
-def update_status(message: str, scope: str = 'ROOP.CORE') -> None:
-    print(f'[{scope}] {message}')
-    print(message)
-    print(scope)
-    if message == 'No face in source path detected.' and scope == 'ROOP.FACE-SWAPPER':
-        print('WOW WOW WOW')
-
-
+# Refactor functions in roop.core
 def start() -> None:
     for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
         if not frame_processor.pre_start():
@@ -96,6 +81,7 @@ def start() -> None:
     else:
         update_status('Processing to video failed!')
 
+
 def run(**kwargs) -> None:
     if not pre_check():
         print('pre-check failed')
@@ -108,42 +94,23 @@ def run(**kwargs) -> None:
     start()
 
 
-def release_resources() -> None:
-    torch.cuda.empty_cache()
-
-
 def swap_pre_start() -> bool:
-    print('------------------New swap_pre_start------------------')
+    global noface
+    NAME = 'ROOP.FACE-SWAPPER'
     if not is_image(roop.globals.source_path):
         update_status('Select an image for source path.', NAME)
         return False
     elif not get_one_face(cv2.imread(roop.globals.source_path)):
         update_status('No face in source path detected.', NAME)
+        noface = 1
         return False
     if not is_image(roop.globals.target_path) and not is_video(roop.globals.target_path):
         update_status('Select an image or video for target path.', NAME)
         return False
     return True
 
+
+# Overwrite other roop functions
 roop.core.update_status = update_status
 roop.core.release_resources = release_resources
-import roop.processors.frame.face_swapper
 roop.processors.frame.face_swapper.pre_start = swap_pre_start
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-class Body(BaseModel):
-    source_path: str
-    target_path: str
-    output_path: str
-
-app = FastAPI()
-
-@app.post("/")
-async def root(body: Body):
-    roop.globals.source_path = body.source_path
-    roop.globals.target_path = body.target_path
-    roop.globals.output_path = body.output_path
-    run()
-    return {"message": "Alo Job finished"}
