@@ -3,16 +3,14 @@
 import datetime
 import logging
 import os
-from logging.handlers import TimedRotatingFileHandler
 
 from api_app_config import log_folder
 
 
 def get_logger(name):
     # Get today's date as yyyy-mm-dd and construct the log file name
-    log_file = os.path.join(
-        log_folder, datetime.datetime.now().strftime("%Y-%m-%d") + ".txt"
-    )
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    log_file = os.path.join(log_folder, current_date + ".txt")
 
     # Check if the directory exists, if not, create it
     if not os.path.exists(log_folder):
@@ -22,10 +20,20 @@ def get_logger(name):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
-    # Create a file handler that logs even debug messages and rotates the log file at midnight
-    handler = TimedRotatingFileHandler(
-        log_file, when="midnight", interval=1, backupCount=0
-    )
+    # If the logger has handlers, check if the current handler's log file is for today's date
+    if logger.hasHandlers():
+        current_handler = logger.handlers[0]
+        if not current_handler.baseFilename.startswith(log_file):
+            # If the log file is not for today's date, remove the current handler
+            logger.removeHandler(current_handler)
+            # Also remove the console handler
+            logger.removeHandler(logger.handlers[0])
+        else:
+            # If the log file is for today's date, return the existing logger
+            return logger
+
+    # Create a file handler that logs even debug messages
+    handler = logging.FileHandler(log_file)
     handler.setLevel(logging.INFO)
 
     # Create a console handler
