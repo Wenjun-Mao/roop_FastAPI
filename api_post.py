@@ -21,5 +21,12 @@ async def handle_connection_reset_error(request, exc):
         status_code=500, content={"message": "---Unexpected connection error---"}
     )
 
+@app.exception_handler(Exception)
+async def general_exception_handler(request, exc):
+    logger.error(f"An error occurred: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"message": "An error occurred. Please try again later."},
+    )
 
 user_picture_endpoint(app, lock)
