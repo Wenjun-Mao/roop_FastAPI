@@ -29,11 +29,11 @@ async def general_exception_handler(request, exc):
 async def download_video(date: str, video_name: str):
     file_path = f"{media_path}/api_outgoing/video/{date}/{video_name}"
     logger.info(f"Downloading video: {file_path}")
-    return FileResponse(file_path)
+    return FileResponse(file_path, headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/download_pic/{date}/{pic_name}")
 async def download_pic(date: str, pic_name: str):
     file_path = f"{media_path}/api_outgoing/pic/{date}/{pic_name}"
     logger.info(f"Downloading picture: {file_path}")
-    return FileResponse(file_path)
+    return FileResponse(file_path, headers={"Cache-Control": "public, max-age=3600"})
