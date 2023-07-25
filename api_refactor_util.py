@@ -32,9 +32,11 @@ def run_media_processing_script(
 
     if os.environ.get("NO_FACE") == "1":
         if content_type == "video":
-            return f"{server_address}/download_video/{default_video_path}"
+            # return f"{server_address}/download_video/{default_video_path}"
+            return "1"
         elif content_type == "picture":
-            return f"{server_address}/download_pic/{default_picture_path}"
+            # return f"{server_address}/download_pic/{default_picture_path}"
+            return "1"
 
     logger.info("Script finished in %s seconds.", round(time.time() - start_time, 2))
 
