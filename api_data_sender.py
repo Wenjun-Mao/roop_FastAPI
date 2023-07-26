@@ -1,7 +1,8 @@
 # api_destination_handler.py
 
 import requests
-from api_app_config import destination_url
+import time
+from api_app_config import destination_url, sync_max_retries
 from api_logger_config import get_logger
 
 logger = get_logger(__name__)
@@ -15,10 +16,16 @@ async def send_return_data_to_api(id_value, download_url):
         "id": id_value,
     }
     logger.info(f"Sending data to destination API: {data}")
-    # Send the file and id to the final destination (point E)
-    try:
-        response_E = requests.post(destination_url, json=data, timeout=20)
-        # Raise an exception if the response contains a HTTP error status code
-        response_E.raise_for_status()
-    except requests.RequestException as e:
-        logger.error(f"Failed request to destination API: {e}")
+    
+    for attempt in range(sync_max_retries):
+        try:
+            response_E = requests.post(destination_url, json=data, timeout=20)
+            response_E.raise_for_status()
+            break
+        except requests.RequestException as e:
+            logger.error(f"Failed request to destination API on attempt {attempt+1}: {e}")
+            if attempt < sync_max_retries - 1:
+                time.sleep(5) 
+            else:
+                logger.error("All attempts failed.")
+                raise
