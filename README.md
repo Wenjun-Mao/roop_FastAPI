@@ -1,13 +1,13 @@
 # roop_FastAPI
 roop_FastAPI is a web API wrapper for the "roop" project, designed to provide a user-friendly interface for interactions with the underlying roop system.
 roop_FastAPI allow for sending a POST with headless args and retrieving output with GET once ready.
-In order to improve the output capacity, this wrapper overloaded quite a few functions from the original roop project. This does not involve changing any code in the original roop repo. All the overloading is handled by the wrapper itself.
+In order to improve the output capacity, this wrapper applies monkey patching on a few functions from the original roop project. This does not involve changing any code in the original roop repo.
 
 
 ## Description
-This wrapper is developed with FastAPI and provides endpoints for both POST and GET requests. The POST endpoint allows users to send data which could include an image, a user identifier and other parameters. This data is then processed and passed to the underlying roop project, which is called through a subprocess.
+This wrapper is developed with FastAPI and provides endpoints for both POST and GET requests. The POST endpoint allows users to send data which could include an image, a user identifier and other parameters.
 
-The GET endpoint, on the other hand, allows users to download a processed video. Once the POST request is processed, a URL is provided where the user can download the resulting video.
+The GET endpoint, on the other hand, allows users to download a processed video. Once the POST request is processed, a URL is provided where the user can download the resulting video. The GET endpoint can be used standalone or be coupled with Nginx for caching for improved performance.
 
 
 ## Features
