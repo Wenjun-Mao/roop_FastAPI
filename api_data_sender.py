@@ -20,6 +20,7 @@ async def send_return_data_to_api(id_value, download_url):
     for attempt in range(sync_max_retries):
         try:
             response_E = requests.post(destination_url, json=data, timeout=20)
+            logger.info(f"Response from destination API: {response_E.status_code} {response_E.json()} id: {id_value}")
             response_E.raise_for_status()
             break
         except requests.RequestException as e:
