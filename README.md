@@ -1,6 +1,7 @@
 # roop_FastAPI
 roop_FastAPI is a web API wrapper for the "roop" project, designed to provide a user-friendly interface for interactions with the underlying roop system.
 roop_FastAPI allow for sending a POST with headless args and retrieving output with GET once ready.
+In order to improve the output capacity, this wrapper overloaded quite a few functions from the original roop project. This does not involve changing any code in the original roop repo. All the overloading is handled by the wrapper itself.
 
 
 ## Description
