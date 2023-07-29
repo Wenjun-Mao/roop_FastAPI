@@ -16,17 +16,24 @@ async def send_return_data_to_api(id_value, download_url):
         "id": id_value,
     }
     logger.info(f"Sending data to destination API: {data}")
+
+    try:
+        response_E = requests.post(destination_url, json=data, timeout=20)
+        logger.info(f"Response from destination API: {response_E.status_code} {response_E.json()} id: {id_value}")
+        response_E.raise_for_status()
+    except requests.RequestException as e:
+        logger.error(f"Failed request to destination API: {e}")
     
-    for attempt in range(sync_max_retries):
-        try:
-            response_E = requests.post(destination_url, json=data, timeout=20)
-            logger.info(f"Response from destination API: {response_E.status_code} {response_E.json()} id: {id_value}")
-            response_E.raise_for_status()
-            break
-        except requests.RequestException as e:
-            logger.error(f"Failed request to destination API on attempt {attempt+1}: {e}")
-            if attempt < sync_max_retries - 1:
-                time.sleep(5) 
-            else:
-                logger.error("All attempts failed.")
-                raise
+    # for attempt in range(sync_max_retries):
+    #     try:
+    #         response_E = requests.post(destination_url, json=data, timeout=20)
+    #         logger.info(f"Response from destination API: {response_E.status_code} {response_E.json()} id: {id_value}")
+    #         response_E.raise_for_status()
+    #         break
+    #     except requests.RequestException as e:
+    #         logger.error(f"Failed request to destination API on attempt {attempt+1}: {e}")
+    #         if attempt < sync_max_retries - 1:
+    #             time.sleep(5) 
+    #         else:
+    #             logger.error("All attempts failed.")
+    #             raise
