@@ -1,8 +1,10 @@
 # api_refactor_util.py
 
 import os
-from api_util_content_manager import *
+
 from api_refactor_roop_func2 import *
+from api_util_content_manager import *
+
 
 def run_media_processing_script(
     content_type: str, incoming_file_path: str, content_name: str, face_restore: bool
@@ -63,7 +65,7 @@ def user_picture_endpoint(app, lock):
         url: Optional[str] = Form(None),
         id: str = Form(...),
     ):
-        os.environ['NO_FACE'] = '0'
+        os.environ["NO_FACE"] = "0"
         url = unquote(url) if url else None
         logger.info(
             "content_name: %s, face_restore: %s, file: %s, url: %s",
@@ -86,7 +88,6 @@ def user_picture_endpoint(app, lock):
             )
             logger.info(f"face swap successful for id: {id_value}")
             logger.info(f"download_link: {download_link}")
-            schedule_data_send_task(background_tasks, id_value, download_link)
+        schedule_data_send_task(background_tasks, id_value, download_link)
 
-            return {"download_link": download_link}
-
+        return {"download_link": download_link}

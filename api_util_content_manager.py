@@ -1,5 +1,6 @@
 # api_util_content_manager.py
 
+import asyncio
 import datetime
 import os
 import subprocess
@@ -8,13 +9,16 @@ import time
 from typing import Optional
 from urllib.parse import unquote
 
+import httpx
 import requests
+from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
+
 from api_app_config import (DEBUG, default_picture_path, default_video_path,
-                            media_path, script_path, server_address)
+                            download_max_retries, media_path, script_path,
+                            server_address)
 from api_data_sender import send_return_data_to_api
 from api_face_restore import apply_face_restoration_to_picture
 from api_logger_config import get_logger
-from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
 
 logger = get_logger(__name__)
 
@@ -46,6 +50,7 @@ def validate_inputs(
 
 
 def download_from_url_with_retry(url: str, timeout: int = 15, max_attempts: int = 3):
+    max_attempts = download_max_retries
     start_time = time.time()
     attempts = 0
     while attempts < max_attempts:
@@ -214,6 +219,6 @@ def user_picture_endpoint(app, lock):
                 content_type, incoming_file_path, content_name, face_restore
             )
             logger.info(f"face swap successful for id: {id_value}")
-            schedule_data_send_task(background_tasks, id_value, download_link)
+        schedule_data_send_task(background_tasks, id_value, download_link)
 
-            return {"download_link": download_link}
+        return {"download_link": download_link}

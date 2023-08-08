@@ -2,9 +2,10 @@
 
 import logging
 
-from api_app_config import media_path, default_picture_path, default_video_path
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
+
+from api_app_config import default_picture_path, default_video_path, media_path
 
 # Set up logging
 logging.basicConfig(
@@ -15,6 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):
