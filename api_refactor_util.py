@@ -80,7 +80,7 @@ def user_picture_endpoint(app, lock):
 
         validate_inputs(content_type, content_name, file, url)
         incoming_file_path = create_incoming_file_path(file, url)
-        save_incoming_file(file, url, incoming_file_path)
+        await save_incoming_file(file, url, incoming_file_path)
 
         async with lock:
             download_link = run_media_processing_script(

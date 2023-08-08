@@ -5,7 +5,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 
-from api_app_config import default_picture_path, default_video_path, media_path
+from api_app_config import media_path
 
 # Set up logging
 logging.basicConfig(

@@ -183,6 +183,7 @@ def run_media_processing_script(
     return f"{server_address}/download_video/{current_mmdd}/{output_filename}"
 
 
+# Monkey patched in api_refactor_util.py
 def schedule_data_send_task(
     background_tasks: BackgroundTasks, id_value: str, download_link: str
 ):
@@ -221,6 +222,7 @@ def user_picture_endpoint(app, lock):
                 content_type, incoming_file_path, content_name, face_restore
             )
             logger.info(f"face swap successful for id: {id_value}")
+            logger.info(f"download_link: {download_link}")
         schedule_data_send_task(background_tasks, id_value, download_link)
 
         return {"download_link": download_link}
