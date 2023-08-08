@@ -28,12 +28,18 @@ async def send_return_data_to_api(id_value, download_url):
                 )
                 response_E.raise_for_status()
                 break  # If successful, exit the loop
-        except httpx.RequestError as e:
+        except Exception as e:  # Catch other potential exceptions
             logger.warning(
                 f"Attempt {attempt + 1} failed to send request to destination API: {e}"
             )
-            if attempt == max_attempts - 1:  # If it's the last attempt, log as an error
-                await asyncio.sleep(5)
-                logger.error(
-                    f"Failed request to destination API after {max_attempts} attempts: {e}"
-                )
+
+        if attempt < max_attempts - 1:  # If not the last attempt, sleep
+            await asyncio.sleep(5)  # Sleep for 5 seconds between attempts
+
+    else:  # If loop completes without a break, all attempts failed
+        logger.error(
+            f"Failed request to destination API after {max_attempts} attempts."
+        )
+        return False
+
+    return True  # If successful
