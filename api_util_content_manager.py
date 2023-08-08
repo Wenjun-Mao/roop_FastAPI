@@ -13,9 +13,15 @@ import httpx
 import requests
 from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
 
-from api_app_config import (DEBUG, default_picture_path, default_video_path,
-                            download_max_retries, media_path, script_path,
-                            server_address)
+from api_app_config import (
+    DEBUG,
+    default_picture_path,
+    default_video_path,
+    download_max_retries,
+    media_path,
+    script_path,
+    server_address,
+)
 from api_data_sender import send_return_data_to_api
 from api_face_restore import apply_face_restoration_to_picture
 from api_logger_config import get_logger
@@ -49,7 +55,9 @@ def validate_inputs(
         )
 
 
-async def download_from_url_with_retry(url: str, timeout: int = 15, max_attempts: int = 3):
+async def download_from_url_with_retry(
+    url: str, timeout: int = 15, max_attempts: int = 3
+):
     max_attempts = download_max_retries
     start_time = time.time()
     attempts = 0
