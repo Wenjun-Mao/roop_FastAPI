@@ -21,7 +21,7 @@ def get_logger(name):
     logger.setLevel(logging.INFO)
 
     # If the logger has handlers, check if the current handler's log file is for today's date
-    if logger.hasHandlers():
+    if logger.handlers:
         current_handler = logger.handlers[0]
         if not current_handler.baseFilename.startswith(log_file):
             # If the log file is not for today's date, remove the current handler
